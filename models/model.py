@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from ablation_models.frontend import BeatThis
+from frontend import BeatThis
 
 
 class residual_block(nn.Module):
