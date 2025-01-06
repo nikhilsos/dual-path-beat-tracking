@@ -59,12 +59,15 @@ class TCN(nn.Module):
     def forward(self, x):
         # x: spectrogram of size (B, T, mel_bin)
         
+        x = x.unsqueeze(0)  #(B, 1, T, mel_bin)
+        print('at first', x.shape)
         x = self.conv1(x)
         x = self.maxpool1(x)
         x = nn.ELU()(x)
         x = self.dropout1(x)
         
-    
+        
+
         x = self.conv2(x)
         x = self.maxpool2(x)
         x = nn.ELU()(x)
@@ -75,6 +78,11 @@ class TCN(nn.Module):
         x = self.conv3(x)
         x = self.maxpool3(x)
         x = nn.ELU()(x)
+        x = self.dropout3(x)  
+
+          #(B, 20, T, 1)
+        # print('after convo', x.shape)
+
 
         x = x.squeeze(-1) #(B, 20, T)
         print('after convo', x.shape)
@@ -91,13 +99,12 @@ class TCN(nn.Module):
         x = torch.relu(x).transpose(-2, -1)
 
      
-       
-        x_combined = self.alpha * x + (1 - self.alpha) * beatthisres 
-        # on hindsight, maybe hadamard product would've been a better feature aggregator
-        x_combined = x_combined.unsqueeze(0) 
+        # print(x.shape, beatthisres.shape)
+        x_combined = self.alpha * x + (1 - self.alpha) * beatthisres #.transpose(1, 2)
+        x_combined = x_combined #.squeeze(0) # squeeze during training unsqueeze during gradcam usage
 
         x = self.out_linear(x_combined)
-     
+        # y = self.out_linear(beatthisres)
 
     
 
